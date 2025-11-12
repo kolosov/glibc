@@ -114,6 +114,11 @@ otherwise.
 
 updogInstall() {
 
+    local UPDOG_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    if [ -z "${UPDOG_DIR}" ]; then
+        rlFail "Can't determine the location of the updog sources!"
+        return 1
+    fi
     if [[ -z $1 ]]; then
         if [[ -z $UPDOG_GLIBC_BUILD ]]; then
             rlFail "No idea what to do, build NOT specified in UPDOG_GLIBC_BUILD nor as a parameter...";
@@ -124,9 +129,9 @@ updogInstall() {
     fi
     if rlIsRHEL ">=8"
     then
-        /mnt/tests/tools/glibc/Library/updog/rpmdev-vercmp3 "$UPDOG_GLIBC_BUILD" "$(rpm --qf %{name}-%{version}-%{release} -q glibc.$(arch))"
+        "${UPDOG_DIR}/rpmdev-vercmp3" "$UPDOG_GLIBC_BUILD" "$(rpm --qf %{name}-%{version}-%{release} -q glibc.$(arch))"
     else
-        /mnt/tests/tools/glibc/Library/updog/rpmdev-vercmp "$UPDOG_GLIBC_BUILD" "$(rpm --qf %{name}-%{version}-%{release} -q glibc.$(arch))"
+        "${UPDOG_DIR}/rpmdev-vercmp" "$UPDOG_GLIBC_BUILD" "$(rpm --qf %{name}-%{version}-%{release} -q glibc.$(arch))"
     fi
     what=$?
     if test $what -eq 12; then
@@ -151,9 +156,9 @@ updogInstall() {
         rlRun "pushd $(arch)"
         if rlIsRHEL ">=8"
         then
-            rlRun "/mnt/tests/tools/glibc/Library/updog/download-packages3 $UPDOG_GLIBC_BUILD_URL"
+            rlRun "\"${UPDOG_DIR}/download-packages3\" \"$UPDOG_GLIBC_BUILD_URL\""
         else
-            rlRun "/mnt/tests/tools/glibc/Library/updog/download-packages $UPDOG_GLIBC_BUILD_URL"
+            rlRun "\"${UPDOG_DIR}/download-packages\" \"$UPDOG_GLIBC_BUILD_URL\""
         fi
         rlRun "popd"
     else
