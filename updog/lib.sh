@@ -174,7 +174,8 @@ updogInstall() {
     packages=""
     for p in $(updog_print_glibc); do
         vrold=$(rpm --qf "%{version}-%{release}\n" -q $p)
-        vrnew="${glibc_version}-${glibc_release}"
+        #workaround for draft build
+        vrnew="${glibc_version}-${glibc_release%,draft*}"
         pp="$(echo $p | sed s/$vrold/$vrnew/)"
         packages="$packages $(echo $pp | rev | cut -d. -f1 | rev)/$pp.rpm"
     done; unset p
